@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html ng-app="ngApp">
+	<head>
+		<title>Chat Panel</title>
+
+		<style type="text/css" name="fonts">
+			body, textarea {font-family: sans-serif; font-size: 11pt; line-height: 1.25;}
+		</style>
+		<style type="text/css" name="colors">
+			.color1-fg{color: #fff;}
+			.color1-bg{background-color: #fff;}
+			.color2-fg{color: #6db52e;}
+			.color2-bg{background-color: #6db52e;}
+			.color5-fg{color: #222;}
+			.color5-bg{background-color: #222;}
+		</style>
+		<style type="text/css">
+			*,*:before,*.after {-moz-box-sizing: border-box; -webkit-box-sizing: border-box; box-sizing: border-box;}
+			body {margin: 0;}
+			page {position: absolute; top: 0; right: 0; bottom: 0; left: 0; overflow: hidden; display: flex; flex-flow: column; justify-content: space-between;}
+			page>block {flex-grow: 1;}
+			block {display: block; overflow: auto;}
+			block[fixed] {position: fixed; width: 100%; z-index: 999;}
+			block[scrollx] {overflow-x: scroll;}
+			block[scrolly] {overflow-y: scroll;}
+			row {display: flex; flex-flow: row wrap; justify-content: space-around; width: 100%;}
+			row[auto] {width: auto; justify-content: flex-start;}
+			row[single]{height: 100%; flex-wrap: nowrap; justify-content: space-between;}
+			column {display: inline-block; flex-grow: 100; align-self: auto;}
+			column[auto] {flex-grow: 0;}
+			column[middle] {height: auto !important; align-self: center;}
+			column[center]>* {margin: auto;}
+			details {display: block;}
+			.clearfix:after {visibility: hidden; display: block; font-size: 0; content: " "; clear: both; height: 0;} * html .clearfix { zoom: 1; } /* IE6 */ *:first-child+html .clearfix { zoom: 1; } /* IE7 */
+		</style>
+    <link rel="stylesheet" type="text/css" href="/easyrtc/easyrtc.css" />
+    <link rel="stylesheet" type="text/css" href="libraries.css" />
+    <script src="/socket.io/socket.io.js"></script>
+    <script type="text/javascript" src="/easyrtc/easyrtc.js"></script>
+    <script type="text/javascript" src="libraries.js"></script>
+    <script type="text/javascript" src="client.js"></script>
+		<script type="text/javascript">
+			// date.now polyfill
+			if (!Date.now()) Date.now = function(){ return new Date().getTime() };
+		</script>
+	</head>
+	<body ng-controller="ChatCtrl">
+		<page class="color2-bg color5-fg">
+			<style type="text/css" scoped>
+				page{text-align: center;}
+				block[name='connected-parties']{height: 20%; border-bottom: medium solid #6db52e;}
+				block[name='message-space']{height: 10%; border-top: medium solid;}
+				button{outline-color: #ccc;}
+			</style>
+
+			<block name="connected-parties" class="color1-bg color1-fg">
+				<style type="text/css" scoped>
+					block[name='connected-parties'] row{padding: 0.5%; -webkit-padding-after: 0.25%;}
+					block[name='connected-parties'] column{height: 100%; text-align: left;}
+					block[name='connected-parties'] user{display: inline-block; zwidth: 300px; height: 100%; padding-left: 100px; background: #ade56e url('person-light-large.png') no-repeat; background-size: contain;}
+					block[name='connected-parties'] user>*{display: block;}
+					block[name='connected-parties'] button{width: 50px; height: 50px; margin-right: 15px; background: #ade56e no-repeat center center; background-size: cover; border: medium solid #ade56e; border-radius: 100%; vertical-align: top;}
+					block[name='connected-parties'] button.on{ border: none;}
+					block[name='connected-parties'] #startChat{background-image: url('chat-dark-large.png');}
+					block[name='connected-parties'] #startVideo{background-image: url('video-dark-large.png');}
+					block[name='connected-parties'] #startAudio{background-image: url('phone-dark-large.png');}
+					block[name='connected-parties'] #startChat.on{background-image: url('chat-light-large.png');}
+					block[name='connected-parties'] #startVideo.on{background-image: url('video-light-large.png');}
+					block[name='connected-parties'] #startAudio.on{background-image: url('phone-light-large.png');}
+				</style>
+				<row single>
+					<column id="parties" class="color1-bg color5-fg">
+						<user ng-repeat="occupant in chat.room.occupants">
+							<name>{{occupant.name}}</name>
+							<status>online</status>
+						</user>
+					</column>
+					<column middle auto>
+						<button id="startChat" class="on" title="turn text chat on/off" onclick="chat(this)"></button>
+						<button id="startVideo" title="turn video chat on/off" onclick="video(this)"></button>
+						<button id="startAudio" title="turn voice chat on/off" ng-click="chat.startAudioCall()"></button>
+					</column>
+				</row>
+				<script type="text/javascript">
+					function chat(el){
+						$(el).toggleClass('on');
+					};
+					function video(el){
+						$(el).toggleClass('on');
+					};
+					function audio(el){
+						$(el).toggleClass('on');
+					};
+				</script>
+			</block>
+			<block id="chat-roll" name="chat-roll" class="color1-bg" scrolly>
+				<style type="text/css" scoped>
+					block[name='chat-roll']{flex-grow: 100; padding: 1%; padding-bottom: 10em}
+					block[name='chat-roll'] message{position: relative; display: block; width: 80%; margin: 2em auto; padding: 0.5em 0.75em; background-color: #ade56e; border-radius: 0.4em; text-align: left;}
+					block[name='chat-roll'] message[author^='user']{margin-right: auto; margin-left: 1%;}
+					block[name='chat-roll'] message[author='me']{background-color: #cdff8e; margin-right: 1%; margin-left: auto;}
+					block[name='chat-roll'] message[author^='user']:before{position: absolute; top: 10px; left: -7px; content: ''; display: inline-block; border-top: 7px solid transparent; border-right: 7px solid #ade56e; border-bottom: 7px solid transparent;}
+					block[name='chat-roll'] message[author='me']:before{position: absolute; top: 10px; right: -7px; content: ''; display: inline-block; border-top: 7px solid transparent; border-left: 7px solid #cdff8e; border-bottom: 7px solid transparent;}
+					block[name='chat-roll'] message:after{position: absolute; top: -1.5em; left: 0; content: attr(author); color: #6db52e; font-weight: bold;}
+				</style>
+        <message author="{{message.sender.name}}" time="" ng-repeat="message in chat.room.messages">{{message.content}}</message>
+			</block>
+			<block name="message-space" class="color1-bg color2-fg">
+				<style type="text/css" scoped>
+					block[name='message-space']{}
+					block[name='message-space'] input{width: 80%; height: 100%; padding: 0.5%; border: none; word-break: break-word; outline: none;}
+				</style>
+        <form ng-submit="sendMessage()">
+				<input id="message-input" autofocus placeholder="Send a message" ng-model="message"></input>
+        </form>
+				<script id="tests" type="text/javascript">
+
+				</script>
+			</block>
+		</page>
+		<video id="callerAudio"> </video>
+	</body>
+</html>
+<!-- TO DO >
+Add status of connected parties
+Add typing indicator
+Add special character interpretation
+Add new message indicators with inhibited scrolling
+Add support for party avatars
+Show message times
+Support ctrl-enter for new line in message
+Support out of order message reception
+
+<       -->

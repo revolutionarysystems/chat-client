@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html ng-app="ngApp">
+	<head>
+		<title>Group Call</title>
+    <link rel="stylesheet" type="text/css" href="/easyrtc/easyrtc.css" />
+    <link rel="stylesheet" type="text/css" href="libraries.css" />
+    <script src="/socket.io/socket.io.js"></script>
+    <script type="text/javascript" src="/easyrtc/easyrtc.js"></script>
+    <script type="text/javascript" src="libraries.js"></script>
+    <script type="text/javascript" src="group.js"></script>
+		<script type="text/javascript">
+			// date.now polyfill
+			if (!Date.now()) Date.now = function(){ return new Date().getTime() };
+		</script>
+	</head>
+	<body ng-controller="GroupChatCtrl">
+		<div ng-repeat="occupant in chat.room.occupants">
+			<div>{{occupant.name}}</div>
+			<video id="{{occupant.id}}-video"> </video>
+		</div>
+	</body>
+</html>

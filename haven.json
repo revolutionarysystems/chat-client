@@ -1,0 +1,30 @@
+{
+	"name": "chat-core-js",
+	"version": "0.1.0-SNAPSHOT",
+	"artifacts": [{
+		"files": [{
+			"dist/chat-client.tar.gz": "chat-client.tar.gz"
+		}]
+	}],
+	"repositories": {
+		"distribution": [{
+			"url": "http://build.revsys.co.uk/haven-repository"
+		}]
+	},
+	"dependencies": [{
+		"name": "angularjs",
+		"version": "1.2.13",
+		"includes": ["angular.js"]
+	}, {
+		"name": "jquery",
+		"version": "2.1.0-2",
+		"includes": ["jquery.js"]
+	}, {
+		"name": "bootstrap",
+		"version": "3.1.1",
+		"includes": [
+			"bootstrap.css",
+			"bootstrap.js"
+		]
+	}]
+}
