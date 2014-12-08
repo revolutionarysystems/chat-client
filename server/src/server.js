@@ -9,7 +9,7 @@ var httpApp = express();
 httpApp.use(express.static(__dirname + "/client/"));
 
 // Start Express http server on port 8080
-var webServer = http.createServer(httpApp).listen(8070);
+var webServer = http.createServer(httpApp).listen(8071);
 
 // Start Socket.io so it attaches itself to Express server
 var socketServer = io.listen(webServer, {"log level":1});

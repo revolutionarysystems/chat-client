@@ -2,3 +2,11 @@
 /dist
 /haven_artifacts
 /node_modules
+/app/node_modules
+/app/build
+/app/dist
+/app/haven_artifacts
+/client/node_modules
+/client/haven_artifacts
+/server/node_modules
+/server/dist
