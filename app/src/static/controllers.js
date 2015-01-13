@@ -25,7 +25,12 @@ ngApp.controller('ChatCtrl', function($scope) {
         return name;
       }
       this.getRooms = function() {
-        return [window.location.hash.substring(1)];
+        var hash = window.location.hash.substring(1);
+        if(hash!=""){
+          return hash.split("|");
+        }else{
+          return [];
+        }
       }
     },
     notify: true

@@ -56,23 +56,33 @@
 					block[name='connected-parties'] column{height: 100%; text-align: left;}
 					block[name='connected-parties'] user{display: inline-block; zwidth: 300px; height: 100%; padding-left: 100px; background: #ade56e url('person-light-large.png') no-repeat; background-size: contain;}
 					block[name='connected-parties'] user>*{display: block;}
-					block[name='connected-parties'] button{width: 50px; height: 50px; margin-right: 15px; background: #ade56e no-repeat center center; background-size: cover; border: medium solid #ade56e; border-radius: 100%; vertical-align: top;}
-					block[name='connected-parties'] button.on{ border: none;}
+					block[name='connected-parties'] #actions button{width: 50px; height: 50px; margin-right: 15px; background: #ade56e no-repeat center center; background-size: cover; border: medium solid #ade56e; border-radius: 100%; vertical-align: top;}
+					block[name='connected-parties'] #actions button.on{ border: none;}
 					block[name='connected-parties'] #startChat{background-image: url('chat-dark-large.png');}
 					block[name='connected-parties'] #startVideo{background-image: url('video-dark-large.png');}
 					block[name='connected-parties'] #startAudio{background-image: url('phone-dark-large.png');}
 					block[name='connected-parties'] #startChat.on{background-image: url('chat-light-large.png');}
 					block[name='connected-parties'] #startVideo.on{background-image: url('video-light-large.png');}
 					block[name='connected-parties'] #startAudio.on{background-image: url('phone-light-large.png');}
+					block[name='connected-parties'] #rooms input{color:black;}
+					block[name='connected-parties'] #rooms button{background-color:white;color:#ade56e;}
+					block[name='connected-parties'] #rooms button.unread{background-color:orange;color:white;border-color:orange;}
+					block[name='connected-parties'] #rooms button.on{background-color:#ade56e;color:white;}
 				</style>
 				<row single>
+					<column id="rooms">
+						<button ng-repeat="room in chat.rooms" ng-click="chat.changeRoom(room.name)" ng-class="{on: room.name == chat.room.name, unread: room.hasUnseenMessages}">{{room.name}}</button>
+						<button ng-click="chat.leaveRoom()">Leave Room</button>
+						<input type="text" ng-model="chat.newRoom" value="" placeholder="new room"/>
+						<button ng-click="chat.joinRoom(chat.newRoom)">Join New Room</button>
+					</column>
 					<column id="parties" class="color1-bg color5-fg">
 						<user ng-repeat="occupant in chat.room.occupants">
 							<name>{{occupant.name}}</name>
 							<status>online</status>
 						</user>
 					</column>
-					<column middle auto>
+					<column id="actions" middle auto>
 						<button id="startChat" class="on" title="turn text chat on/off" onclick="chat(this)"></button>
 						<button id="startVideo" title="turn video chat on/off" onclick="video(this)"></button>
 						<button id="startAudio" title="turn voice chat on/off" ng-click="chat.startAudioCall()"></button>
@@ -94,13 +104,13 @@
 				<style type="text/css" scoped>
 					block[name='chat-roll']{flex-grow: 100; padding: 1%; padding-bottom: 10em}
 					block[name='chat-roll'] message{position: relative; display: block; width: 80%; margin: 2em auto; padding: 0.5em 0.75em; background-color: #ade56e; border-radius: 0.4em; text-align: left;}
-					block[name='chat-roll'] message[author^='user']{margin-right: auto; margin-left: 1%;}
-					block[name='chat-roll'] message[author='me']{background-color: #cdff8e; margin-right: 1%; margin-left: auto;}
-					block[name='chat-roll'] message[author^='user']:before{position: absolute; top: 10px; left: -7px; content: ''; display: inline-block; border-top: 7px solid transparent; border-right: 7px solid #ade56e; border-bottom: 7px solid transparent;}
-					block[name='chat-roll'] message[author='me']:before{position: absolute; top: 10px; right: -7px; content: ''; display: inline-block; border-top: 7px solid transparent; border-left: 7px solid #cdff8e; border-bottom: 7px solid transparent;}
+					block[name='chat-roll'] message.user{margin-right: auto; margin-left: 1%;}
+					block[name='chat-roll'] message.me{background-color: #cdff8e; margin-right: 1%; margin-left: auto;}
+					block[name='chat-roll'] message.user:before{position: absolute; top: 10px; left: -7px; content: ''; display: inline-block; border-top: 7px solid transparent; border-right: 7px solid #ade56e; border-bottom: 7px solid transparent;}
+					block[name='chat-roll'] message.me:before{position: absolute; top: 10px; right: -7px; content: ''; display: inline-block; border-top: 7px solid transparent; border-left: 7px solid #cdff8e; border-bottom: 7px solid transparent;}
 					block[name='chat-roll'] message:after{position: absolute; top: -1.5em; left: 0; content: attr(author); color: #6db52e; font-weight: bold;}
 				</style>
-        <message author="{{message.sender.name}}" time="" ng-repeat="message in chat.room.messages">{{message.content}}</message>
+        <message author="{{message.sender.name}}" ng-class="{me: message.sender.isMe, user: !message.sender.isMe}" time="{{message.time}}" ng-repeat="message in chat.room.messages">{{message.content}}</message>
 			</block>
 			<block name="message-space" class="color1-bg color2-fg">
 				<style type="text/css" scoped>

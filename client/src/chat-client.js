@@ -11,16 +11,24 @@ var RevsysChatClient = function(config) {
 
   var self = this;
 
+  var connected = false;
+
   this.addToConversation = function(who, msgType, content, targeting) {
     var message = {
       sender: {
         id: who,
-        name: easyrtc.idToName(who)
+        name: easyrtc.idToName(who),
+        isMe: who == this.id
       },
       type: msgType,
-      content: content
+      content: content,
+      time: new Date().getTime()
     };
-    this.rooms[targeting.targetRoom].messages.push(message);
+    var room = this.rooms[targeting.targetRoom];
+    room.messages.push(message);
+    if (room.name != this.room.name) {
+      room.hasUnseenMessages = true;
+    }
     this.config.addToConversation(message)
   }
 
@@ -36,22 +44,42 @@ var RevsysChatClient = function(config) {
     easyrtc.setRoomEntryListener(function(entered, roomName) {
       self.roomEntryListener.call(self, entered, roomName);
     })
+    easyrtc.setUsername(this.config.dataStore.getUsername());
     var rooms = this.config.dataStore.getRooms();
     for (var i in rooms) {
       room = rooms[i];
-      this.joinRoom(room);
+      this.joinRoom(room, false);
     }
-    easyrtc.setUsername(this.config.dataStore.getUsername());
-    easyrtc.connect("easyrtc.instantMessaging", function(id) {
-      self.loginSuccess.call(self, id);
-    }, loginFailure);
+    if (rooms.length > 0) {
+      easyrtc.connect("easyrtc.instantMessaging", function(id) {
+        self.loginSuccess.call(self, id);
+      }, loginFailure);
+      connected = true;
+    }
   }
 
-  this.joinRoom = function(roomName) {
+  this.joinRoom = function(roomName, connect) {
+    connect = connect || true;
     easyrtc.joinRoom(roomName, {},
       function() {},
       function(errorCode, errorText, roomName) {
         console.log("Couldn't join room: " + errorCode + " " + errorText);
+        easyrtc.showError(errorCode, errorText + ": room name was(" + roomName + ")");
+      });
+    if (connect == true && connected == false) {
+      easyrtc.connect("easyrtc.instantMessaging", function(id) {
+        self.loginSuccess.call(self, id);
+      }, loginFailure);
+      connected = true;
+    }
+  }
+
+  this.leaveRoom = function() {
+    easyrtc.leaveRoom(this.room.name, function() {
+
+      },
+      function(errorCode, errorText, roomName) {
+        console.log("Couldn't leave room: " + errorCode + " " + errorText);
         easyrtc.showError(errorCode, errorText + ": room name was(" + roomName + ")");
       });
   }
@@ -69,12 +97,21 @@ var RevsysChatClient = function(config) {
     } else {
       console.log("Left room " + roomName);
       delete this.rooms[roomName];
+      if (this.room.name == roomName) {
+        var rooms = Object.keys(this.rooms);
+        if (rooms.length > 0) {
+          this.changeRoom(rooms[0]);
+        } else {
+          this.room = {};
+        }
+      }
     }
     this.config.roomEntryListener(entered, roomName);
   }
 
   this.changeRoom = function(roomName) {
     this.room = this.rooms[roomName];
+    this.room.hasUnseenMessages = false;
   }
 
   this.hangup = function() {
@@ -82,13 +119,14 @@ var RevsysChatClient = function(config) {
   }
 
   this.occupantListener = function(roomName, occupants, isPrimary) {
-    this.room.occupants = {};
+    var room = this.rooms[roomName];
+    room.occupants = {};
     for (var i in occupants) {
       var occupant = occupants[i];
       var id = occupant.easyrtcid;
       occupant.id = id;
       occupant.name = easyrtc.idToName(id);
-      this.room.occupants[id] = occupant;
+      room.occupants[id] = occupant;
     }
     this.config.occupantListener(roomName, this.room.occupants, isPrimary);
   }
