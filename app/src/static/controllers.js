@@ -1,46 +1,48 @@
 var ngApp = angular.module('ngApp', []);
 ngApp.controller('ChatCtrl', function($scope) {
 
-  $scope.chat = new RevsysChatClient({
+  $scope.chat = new NGRevsysChatClient($scope, {
     url: "http://dev.echo-central.com:8071",
-    loginSuccess: function() {
-      $scope.$apply();
-    },
-    occupantListener: function() {
-      $scope.$apply();
-    },
     addToConversation: function() {
-      var phase = $scope.$root.$$phase;
-      if (phase != '$apply' && phase != '$digest') {
-        $scope.$apply();
-      }
       $("#chat-roll").scrollTop(300000);
     },
-    roomEntryListener: function() {
-      $scope.$apply();
-    },
-    dataStore: new function() {
-      this.getUsername = function() {
-        var name = prompt("Please enter your name", "");
-        return name;
-      }
-      this.getRooms = function() {
-        var hash = window.location.hash.substring(1);
-        if(hash!=""){
-          return hash.split("|");
-        }else{
-          return [];
+    roomEntryListener: function(entered, roomName) {
+      var rooms = JSON.parse(localStorage.rooms);
+      if (entered) {
+        if (rooms.indexOf(roomName) == -1) {
+          rooms.push(roomName);
+        }
+      } else {
+        var index = rooms.indexOf(roomName);
+        if (index > -1) {
+          rooms.splice(index, index+1);
         }
       }
+      localStorage.rooms = JSON.stringify(rooms);
     },
-    notify: true
+    dataStore: new function() {
+      this.getUserData = function() {
+        var name = localStorage.name;
+        if (!name) {
+          name = prompt("Please enter your name", "");
+          localStorage.name = name;
+        }
+        return {
+          name: name
+        };
+      }
+      this.getRooms = function() {
+        var rooms = localStorage.rooms;
+        if (!rooms) {
+          rooms = [];
+          localStorage.rooms = "[]";
+        } else {
+          rooms = JSON.parse(rooms);
+        }
+        return rooms;
+      }
+    }
   });
-
-  $scope.sendMessage = function() {
-    $scope.chat.sendMessage($scope.message, function() {
-      $scope.message = "";
-    })
-  }
 
   $scope.chat.connect();
 

@@ -10,3 +10,5 @@
 /client/haven_artifacts
 /server/node_modules
 /server/dist
+/ng-client/node_modules
+/ng-client/haven_artifacts

@@ -12,7 +12,7 @@
 		}]
 	},
 	"dependencies": [{
-		"name": "chat-client",
+		"name": "chat-ng-client",
 		"version": "0.1.0-SNAPSHOT"
 	},{
 		"name": "angularjs",

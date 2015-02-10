@@ -78,7 +78,7 @@
 					</column>
 					<column id="parties" class="color1-bg color5-fg">
 						<user ng-repeat="occupant in chat.room.occupants">
-							<name>{{occupant.name}}</name>
+							<name>{{chat.getUserData(occupant.id).name}}</name>
 							<status>online</status>
 						</user>
 					</column>
@@ -117,8 +117,8 @@
 					block[name='message-space']{}
 					block[name='message-space'] input{width: 80%; height: 100%; padding: 0.5%; border: none; word-break: break-word; outline: none;}
 				</style>
-        <form ng-submit="sendMessage()">
-				<input id="message-input" autofocus placeholder="Send a message" ng-model="message"></input>
+        <form ng-submit="chat.ngSendMessage()">
+				<input id="message-input" autofocus placeholder="Send a message" ng-model="chat.newMessage"></input>
         </form>
 				<script id="tests" type="text/javascript">
 

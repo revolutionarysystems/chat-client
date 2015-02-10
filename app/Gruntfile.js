@@ -14,7 +14,7 @@ module.exports = function(grunt) {
     },
     concat: {
       js: {
-        src: ['haven_artifacts/main/jquery/**/*.js', 'haven_artifacts/main/angularjs/**/*.js', 'haven_artifacts/main/bootstrap/**/*.js', 'haven_artifacts/main/socket.io-client/dist/socket.io.js', 'haven_artifacts/main/easyrtc/api/easyrtc.js', 'haven_artifacts/main/chat-client/**/*.js'],
+        src: ['haven_artifacts/main/jquery/**/*.js', 'haven_artifacts/main/angularjs/**/*.js', 'haven_artifacts/main/bootstrap/**/*.js', 'haven_artifacts/main/socket.io-client/dist/socket.io.js', 'haven_artifacts/main/easyrtc/api/easyrtc.js', 'haven_artifacts/main/async/lib/async.js', 'haven_artifacts/main/chat-ng-client/**/*.js', 'haven_artifacts/main/chat-client/**/*.js'],
         dest: 'build/static/libraries.js'
       },
       css: {
