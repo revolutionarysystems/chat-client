@@ -1,65 +1,36 @@
 module.exports = function(grunt) {
 
+  function getModules(cmd) {
+    return {
+      'client': cmd,
+      'ng-client': cmd,
+      'server': cmd,
+      'app': cmd
+    };
+  }
+
   // Project configuration.
   grunt.initConfig({
     pkg: grunt.file.readJSON('package.json'),
-    clean: ["build", "dist/*"],
-    concat:{
-      js: {
-        src: ['haven_artifacts/main/jquery/**/*.js', 'haven_artifacts/main/**/*.js'],
-        dest: 'dist/client/libraries.js'
+    subgrunt: {
+      options: {
+        limit: 1
       },
-      css: {
-        src: ['haven_artifacts/main/**/*.css'],
-        dest: 'dist/client/libraries.css'
-      }
+      dist: getModules("dist"),
+      deploy: getModules("deploy"),
+      ci: getModules("ci")
     },
-    copy: {
-      publish: {
-        files: [{
-          expand: true,
-          cwd: 'client',
-          src: ['**/*'],
-          dest: 'dist/client/'
-        },{
-          expand: true,
-          cwd: 'server',
-          src: ['**/*'],
-          dest: 'dist/'
-        }]
-      }
-    },
-    compress: {
-      dist: {
-        options: {
-          mode: "tgz",
-          archive: 'dist/chat-client.tar.gz'
-        },
-        files: [{
-            expand: true,
-            src: ['dist/**/*'],
-            dest: '',
-          },{
-            expand: true,
-            src: ['node_modules/**/*'],
-            dest: '',
-          }
-        ]
-      }
-    }
   });
 
-  grunt.loadNpmTasks('grunt-contrib-copy');
-  grunt.loadNpmTasks('grunt-contrib-clean');
-  grunt.loadNpmTasks('grunt-contrib-concat');
-  grunt.loadNpmTasks('grunt-contrib-compress');
-  grunt.loadNpmTasks('grunt-haven');
+  grunt.loadNpmTasks('grunt-subgrunt');
 
-  grunt.registerTask('build', ['clean', 'concat', 'copy']);
-  grunt.registerTask('dist', ['build', 'compress']);
-  grunt.registerTask('deploy', ['dist', 'haven:deploy']);
+  // Tasks
+  grunt.registerTask('dist', ['subgrunt:dist']);
+  grunt.registerTask('deploy', ['subgrunt:deploy']);
+
+  grunt.registerTask('ci', ['subgrunt:ci']);
 
   // Default task(s).
-  grunt.registerTask('default', ['build']);
+  grunt.registerTask('default', ['deploy']);
 
 };

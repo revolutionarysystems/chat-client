@@ -1,15 +1,10 @@
 {
 	"name": "chat-server",
-	"version": "0.1.0-SNAPSHOT",
+	"master": "../haven.json",
 	"artifacts": [{
 		"files": [{
 			"dist/chat-server.tar.gz": "chat-server.tar.gz"
 		}]
 	}],
-	"repositories": {
-		"distribution": [{
-			"url": "http://build.revsys.co.uk/haven-repository"
-		}]
-	},
 	"dependencies": []
 }

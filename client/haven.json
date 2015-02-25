@@ -1,16 +1,11 @@
 {
 	"name": "chat-client",
-	"version": "0.1.0-SNAPSHOT",
+	"master": "../haven.json",
 	"artifacts": [{
 		"files": [{
 			"src/chat-client.js": "chat-client.js"
 		}]
 	}],
-	"repositories": {
-		"distribution": [{
-			"url": "http://build.revsys.co.uk/haven-repository"
-		}]
-	},
 	"dependencies": [{
 		"name": "socket.io-client",
 		"version": "0.9.16"
