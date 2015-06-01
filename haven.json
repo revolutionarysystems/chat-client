@@ -1,1 +1,1 @@
-{"name":"chat-client-parent","version":["0.2.0-SNAPSHOT"],"isMaster":true,"modules":["client","ng-client","server","app"],"repositories":{"distribution":[{"url":"http://build.revsys.co.uk/haven-repository"}]}}
+{"name":"chat-client-parent","version":"0.2.0","isMaster":true,"modules":["client","ng-client","server","app"],"repositories":{"distribution":[{"url":"http://build.revsys.co.uk/haven-repository"}]}}
